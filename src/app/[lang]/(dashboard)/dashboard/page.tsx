@@ -21,13 +21,14 @@ export default async function DashboardPage(props: {
   const lang = params.lang;
   const session = await auth();
 
-  if (!session || !session.user?.id) {
+  const userId = session?.user?.id;
+  if (!session || !userId) {
     redirect(`/${lang}/login`);
   }
 
   const user = session.user;
   const dict = await getDictionary(lang);
-  const data = await getDashboardData(user.id);
+  const data = await getDashboardData(userId);
 
   if (!data) {
     return (
