@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { title, content, category, isPinned } = await req.json();
+    const { title, content, category, isPinned, color, colSpan, rowSpan } = await req.json();
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -38,6 +38,9 @@ export async function POST(req: Request) {
         title,
         content: content || null,
         category: category || null,
+        color: color || null,
+        colSpan: colSpan || 1,
+        rowSpan: rowSpan || 1,
         isPinned: isPinned || false,
         userId: session.user.id
       }

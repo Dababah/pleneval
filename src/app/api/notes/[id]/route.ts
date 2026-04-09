@@ -21,7 +21,7 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
       return NextResponse.json({ error: "Not found or unauthorized" }, { status: 404 });
     }
 
-    const { title, content, category, isPinned } = body;
+    const { title, content, category, isPinned, color, colSpan, rowSpan } = body;
 
     const note = await prisma.note.update({
       where: { id: params.id },
@@ -29,6 +29,9 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
         title: title !== undefined ? title : existingNote.title,
         content: content !== undefined ? content : existingNote.content,
         category: category !== undefined ? category : existingNote.category,
+        color: color !== undefined ? color : existingNote.color,
+        colSpan: colSpan !== undefined ? colSpan : existingNote.colSpan,
+        rowSpan: rowSpan !== undefined ? rowSpan : existingNote.rowSpan,
         isPinned: isPinned !== undefined ? isPinned : existingNote.isPinned,
       }
     });

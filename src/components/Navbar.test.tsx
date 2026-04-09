@@ -21,7 +21,7 @@ describe('Navbar Component', () => {
   it('renders logo correctly', () => {
     ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'unauthenticated' })
     render(<Navbar lang="en" dict={mockDict} />)
-    expect(screen.getByText('AXION.')).toBeInTheDocument()
+    expect(screen.getByText('PLEN.')).toBeInTheDocument()
   })
 
   it('shows login and register buttons when unauthenticated', () => {

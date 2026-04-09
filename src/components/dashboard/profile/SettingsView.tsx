@@ -25,14 +25,16 @@ import {
   XCircle,
   Github,
   Mail,
-  User as UserIcon
+  User as UserIcon,
+  Heart,
+  QrCode
 } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import AvatarPicker from "./AvatarPicker";
 import { User } from "next-auth";
 
-type SettingsTab = 'menu' | 'ai' | 'telegram' | 'language' | 'connections' | 'profile' | 'general';
+type SettingsTab = 'menu' | 'ai' | 'telegram' | 'language' | 'connections' | 'profile' | 'support';
 
 interface UserSettings {
   aiProvider: string;
@@ -102,6 +104,16 @@ export default function SettingsView({ lang, dict, user }: { lang: string, dict:
   const [openRouterModels, setOpenRouterModels] = useState<any[]>([]);
   const [fetchingModels, setFetchingModels] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
+  // Contact Form State
+  const [contactForm, setContactForm] = useState({ 
+    name: user?.name || "", 
+    email: user?.email || "", 
+    message: "",
+    images: [] as File[]
+  });
+  const [contactSending, setContactSending] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
 
   const providers = [
     { id: 'openai', label: 'OpenAI' },
@@ -376,6 +388,50 @@ export default function SettingsView({ lang, dict, user }: { lang: string, dict:
     router.push(newPathname);
   };
 
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactForm.message) return;
+    
+    setContactSending(true);
+    try {
+      const formData = new FormData();
+      formData.append("name", contactForm.name);
+      formData.append("email", contactForm.email);
+      formData.append("message", contactForm.message);
+      contactForm.images.forEach(img => {
+        formData.append("images", img);
+      });
+
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        body: formData, // No headers needed for FormData
+      });
+      if (res.ok) {
+        setContactSuccess(true);
+        setContactForm(prev => ({ ...prev, message: "", images: [] }));
+        setTimeout(() => setContactSuccess(false), 5000);
+      } else {
+        const data = await res.json();
+        setTestStatus({
+          show: true,
+          loading: false,
+          success: false,
+          message: data.error || "Failed to send message"
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      setTestStatus({
+        show: true,
+        loading: false,
+        success: false,
+        message: "Connection error"
+      });
+    } finally {
+      setContactSending(false);
+    }
+  };
+
   useEffect(() => {
     setIsMounted(true);
     fetchSettings();
@@ -479,7 +535,7 @@ export default function SettingsView({ lang, dict, user }: { lang: string, dict:
             </p>
           </div>
         </div>
-        {activeTab !== 'menu' && activeTab !== 'profile' && (
+        {activeTab !== 'menu' && activeTab !== 'profile' && activeTab !== 'support' && (
           <button 
             onClick={handleSave}
             disabled={saving}
@@ -589,6 +645,26 @@ export default function SettingsView({ lang, dict, user }: { lang: string, dict:
                 <div>
                    <h2 className="text-sm font-black text-zinc-900 uppercase tracking-widest leading-none mb-1">{dict.settings.tabs.connections}</h2>
                    <p className="text-[10px] text-slate-400 font-bold leading-none">{dict.settings.connections.description}</p>
+                </div>
+              </div>
+              <div className="relative z-10 flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest group-hover:text-zinc-900 transition-colors">
+                 <ArrowRight size={14} />
+              </div>
+           </button>
+
+           {/* Card Support & Contact */}
+           <button 
+             onClick={() => setActiveTab('support')}
+             className="group p-6 rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:border-zinc-300 transition-all duration-500 text-left flex items-center justify-between relative overflow-hidden"
+           >
+              <div className="absolute -right-8 -top-8 w-32 h-32 bg-zinc-50 rounded-full group-hover:scale-150 transition-transform duration-700" />
+              <div className="relative z-10 flex items-center gap-6">
+                <div className="w-12 h-12 rounded-2xl bg-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-100 group-hover:scale-110 transition-transform duration-500">
+                   <Mail size={24} />
+                </div>
+                <div>
+                   <h2 className="text-sm font-black text-zinc-900 uppercase tracking-widest leading-none mb-1">{dict.settings.tabs.support}</h2>
+                   <p className="text-[10px] text-slate-400 font-bold leading-none">{dict.settings.support.subtitle}</p>
                 </div>
               </div>
               <div className="relative z-10 flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest group-hover:text-zinc-900 transition-colors">
@@ -1035,8 +1111,8 @@ export default function SettingsView({ lang, dict, user }: { lang: string, dict:
                     {/* Google */}
                     <div className="flex items-center justify-between p-4 bg-zinc-50 border border-slate-100 rounded-2xl">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center p-2 shadow-sm">
-                          <img src="https://www.gstatic.com/images/branding/product/1x/gsuite_48dp.png" alt="Google" className="w-full h-full object-contain" />
+                        <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center p-2.5 shadow-sm">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" className="w-full h-full object-contain" />
                         </div>
                         <div>
                           <p className="text-[11px] font-black text-zinc-900 uppercase tracking-tight">Google Account</p>
@@ -1143,6 +1219,177 @@ export default function SettingsView({ lang, dict, user }: { lang: string, dict:
                       )}
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'support' && (
+              <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="space-y-1">
+                   <div className="flex items-center gap-2 text-rose-500">
+                      <Heart size={18} fill="currentColor" />
+                      <h2 className="text-sm font-black uppercase tracking-widest text-zinc-900">{dict.settings.support.title}</h2>
+                   </div>
+                   <p className="text-[11px] text-slate-400 font-bold">{dict.settings.support.subtitle}</p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-12">
+                   {/* QRIS Section */}
+                   <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-full bg-zinc-900 text-white flex items-center justify-center">
+                            <QrCode size={16} />
+                         </div>
+                         <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">{dict.settings.support.creatorSupport}</h3>
+                      </div>
+                      
+                      <div className="bg-zinc-50 border border-slate-100 rounded-[2rem] p-8 flex flex-col items-center gap-6 shadow-sm hover:shadow-md transition-shadow">
+                         <div className="relative group">
+                            <div className="absolute -inset-4 bg-gradient-to-tr from-rose-500 to-orange-400 rounded-[2.5rem] opacity-20 blur-2xl group-hover:opacity-40 transition-opacity" />
+                            <div className="relative bg-white p-4 rounded-3xl shadow-xl">
+                               <img 
+                                 src="/QRIS.jpeg" 
+                                 alt="Creator QRIS Support" 
+                                 className="w-48 h-48 object-contain rounded-xl"
+                               />
+                            </div>
+                         </div>
+                         <div className="text-center space-y-2">
+                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Scan using any Payment App</p>
+                            <p className="text-[11px] font-bold text-zinc-600 bg-white px-4 py-2 rounded-full border border-slate-100 italic">"Terima kasih atas dukungannya!"</p>
+                         </div>
+                      </div>
+                   </div>
+
+                   {/* Contact Form Section */}
+                   <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-full bg-zinc-900 text-white flex items-center justify-center">
+                            <Mail size={16} />
+                         </div>
+                         <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">{dict.settings.support.contactTitle}</h3>
+                      </div>
+
+                      <form onSubmit={handleContactSubmit} className="space-y-4">
+                         {contactSuccess ? (
+                            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 text-center animate-in zoom-in-95 duration-500">
+                               <div className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-100">
+                                  <CheckCircle2 size={24} />
+                               </div>
+                               <h4 className="text-sm font-black text-emerald-900 uppercase tracking-widest mb-2">Message Sent!</h4>
+                               <p className="text-[11px] text-emerald-700 font-bold leading-relaxed">
+                                  {dict.settings.support.form.success}
+                               </p>
+                            </div>
+                         ) : (
+                            <div className="space-y-4">
+                               <div className="grid gap-2">
+                                  <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">{dict.settings.support.form.name}</label>
+                                  <input 
+                                     type="text"
+                                     required
+                                     className="w-full bg-zinc-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold focus:ring-2 focus:ring-zinc-900 outline-none transition-all"
+                                     value={contactForm.name}
+                                     onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                                  />
+                               </div>
+                               <div className="grid gap-2">
+                                  <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">{dict.settings.support.form.email}</label>
+                                  <input 
+                                     type="email"
+                                     required
+                                     className="w-full bg-zinc-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold focus:ring-2 focus:ring-zinc-900 outline-none transition-all"
+                                     value={contactForm.email}
+                                     onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                                  />
+                               </div>
+                               <div className="grid gap-2">
+                                  <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">{dict.settings.support.form.message}</label>
+                                  <textarea 
+                                     required
+                                     rows={4}
+                                     className="w-full bg-zinc-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold focus:ring-2 focus:ring-zinc-900 outline-none transition-all resize-none"
+                                     value={contactForm.message}
+                                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                                     placeholder="..."
+                                  />
+                               </div>
+
+                               <div className="grid gap-2">
+                                  <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">{dict.settings.support.form.images}</label>
+                                  <div className="flex flex-wrap gap-2">
+                                     {contactForm.images.map((img, i) => (
+                                        <div key={i} className="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden bg-white group/img">
+                                           <img 
+                                              src={URL.createObjectURL(img)} 
+                                              alt="Preview" 
+                                              className="w-full h-full object-cover" 
+                                           />
+                                           <button 
+                                              type="button"
+                                              onClick={() => {
+                                                 const newImgs = [...contactForm.images];
+                                                 newImgs.splice(i, 1);
+                                                 setContactForm({ ...contactForm, images: newImgs });
+                                              }}
+                                              className="absolute inset-0 bg-rose-500/80 text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity"
+                                           >
+                                              <XCircle size={16} />
+                                           </button>
+                                        </div>
+                                     ))}
+                                     {contactForm.images.length < 3 && (
+                                        <label className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-zinc-300 hover:bg-zinc-50 transition-all gap-1 text-slate-400">
+                                           <QrCode size={16} />
+                                           <span className="text-[8px] font-black uppercase">{contactForm.images.length}/3</span>
+                                           <input 
+                                              type="file" 
+                                              className="hidden" 
+                                              accept="image/*" 
+                                              multiple 
+                                              onChange={(e) => {
+                                                 const files = Array.from(e.target.files || []);
+                                                 const validFiles = files.filter(f => f.size <= 1 * 1024 * 1024);
+                                                 
+                                                 if (validFiles.length < files.length) {
+                                                    setTestStatus({
+                                                       show: true,
+                                                       loading: false,
+                                                       success: false,
+                                                       message: dict.settings.support.form.sizeError
+                                                    });
+                                                 }
+
+                                                 const combined = [...contactForm.images, ...validFiles].slice(0, 3);
+                                                 setContactForm({ ...contactForm, images: combined });
+                                              }}
+                                           />
+                                        </label>
+                                     )}
+                                  </div>
+                               </div>
+
+                               <button 
+                                  type="submit"
+                                  disabled={contactSending}
+                                  className="w-full bg-zinc-900 text-white py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-800 active:scale-[0.98] transition-all shadow-lg shadow-zinc-100 flex items-center justify-center gap-2 group"
+                               >
+                                  {contactSending ? (
+                                     <>
+                                        <Loader2 size={14} className="animate-spin" />
+                                        {dict.settings.support.form.sending}
+                                     </>
+                                  ) : (
+                                     <>
+                                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                        {dict.settings.support.form.submit}
+                                     </>
+                                  )}
+                               </button>
+                            </div>
+                         )}
+                      </form>
+                   </div>
                 </div>
               </div>
             )}

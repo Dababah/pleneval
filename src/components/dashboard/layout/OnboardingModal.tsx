@@ -82,7 +82,7 @@ export default function OnboardingModal({ isOpen, dict }: { isOpen: boolean; dic
             Claim your username
           </h2>
           <p className="text-sm text-slate-500 mb-8 leading-relaxed">
-            Welcome to AXION! Before you start tracking, define your unique identity to connect with friends.
+            Welcome to PLEN! Before you start tracking, define your unique identity to connect with friends.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">

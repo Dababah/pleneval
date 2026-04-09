@@ -22,7 +22,7 @@ export async function getTasks() {
     if (!(prisma as any).task) {
       console.warn("Prisma Task model missing. Returning fallback data.");
       return [
-        { id: '1', title: 'Initialize Axion Core', priority: 'high', status: 'done', createdAt: new Date() },
+        { id: '1', title: 'Initialize Plen Core', priority: 'high', status: 'done', createdAt: new Date() },
         { id: '2', title: 'Neural Sync Pending...', priority: 'medium', status: 'in_progress', createdAt: new Date() },
       ];
     }

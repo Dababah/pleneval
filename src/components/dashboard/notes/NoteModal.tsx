@@ -21,6 +21,9 @@ interface Note {
   title: string;
   content: string;
   category?: string | null;
+  color?: string | null;
+  colSpan?: number;
+  rowSpan?: number;
   updatedAt: Date | string;
   isPinned?: boolean;
 }
@@ -28,7 +31,7 @@ interface Note {
 interface NoteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (note: { id?: string; title: string; content: string; category?: string; isPinned?: boolean }) => Promise<void>;
+  onSave: (note: { id?: string; title: string; content: string; category?: string; color?: string; isPinned?: boolean }) => Promise<void>;
   initialData: Note | null;
   dict: any;
   lang: string;
@@ -39,8 +42,20 @@ const NoteModal = ({ isOpen, onClose, onSave, initialData, dict, lang }: NoteMod
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
+  const [color, setColor] = useState("");
   const [isPinned, setIsPinned] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const NOTE_COLORS = [
+    { name: "Default", value: "" },
+    { name: "Red", value: "#fee2e2" },
+    { name: "Orange", value: "#ffedd5" },
+    { name: "Yellow", value: "#fef08a" },
+    { name: "Green", value: "#dcfce7" },
+    { name: "Blue", value: "#e0f2fe" },
+    { name: "Purple", value: "#f3e8ff" },
+    { name: "Pink", value: "#fae8ff" },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -51,6 +66,7 @@ const NoteModal = ({ isOpen, onClose, onSave, initialData, dict, lang }: NoteMod
       setTitle(initialData?.title || "");
       setContent(initialData?.content || "");
       setCategory(initialData?.category || "");
+      setColor(initialData?.color || "");
       setIsPinned(initialData?.isPinned || false);
       document.body.style.overflow = "hidden";
     } else {
@@ -73,6 +89,7 @@ const NoteModal = ({ isOpen, onClose, onSave, initialData, dict, lang }: NoteMod
         title: title.trim(),
         content: content.trim(),
         category: category.trim() || undefined,
+        color: color || undefined,
         isPinned,
       });
       onClose();
@@ -100,10 +117,11 @@ const NoteModal = ({ isOpen, onClose, onSave, initialData, dict, lang }: NoteMod
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", duration: 0.4, bounce: 0.3 }}
-            className="relative w-full max-w-[440px] max-h-[85vh] bg-white rounded-[28px] shadow-2xl border border-slate-100 overflow-hidden flex flex-col"
+            className="relative w-full max-w-[440px] max-h-[85vh] rounded-[28px] shadow-2xl border border-slate-100 overflow-hidden flex flex-col transition-colors duration-300"
+            style={{ backgroundColor: color || "#ffffff" }}
           >
             {/* Header */}
-            <div className="px-6 pt-6 pb-2 flex items-center justify-between sticky top-0 bg-white z-10 shrink-0">
+            <div className="px-6 pt-6 pb-2 flex items-center justify-between sticky top-0 z-10 shrink-0 transition-colors duration-300" style={{ backgroundColor: color || "#ffffff" }}>
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-zinc-900 text-white flex items-center justify-center shadow-md">
                   <FileText size={16} strokeWidth={2.5} />
@@ -166,8 +184,34 @@ const NoteModal = ({ isOpen, onClose, onSave, initialData, dict, lang }: NoteMod
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   placeholder={lang === 'id' ? 'e.g. Kerja, Personal, List' : 'e.g. Work, Personal, List'}
-                  className="w-full h-11 px-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-zinc-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-300 transition-all"
+                  className="w-full h-11 px-4 bg-white/50 backdrop-blur-sm border border-slate-100/60 rounded-xl text-xs font-semibold text-zinc-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-300 transition-all"
                 />
+              </div>
+
+              {/* Color Picker */}
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <div className="w-[10px] h-[10px] rounded-full border-2 border-current" />
+                  <label className="text-[10px] font-semibold uppercase tracking-wider">
+                    {lang === 'id' ? 'Warna Sampul' : 'Cover Color'}
+                  </label>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {NOTE_COLORS.map((c) => (
+                    <button
+                      key={c.name}
+                      type="button"
+                      onClick={() => setColor(c.value)}
+                      className={cn(
+                        "w-7 h-7 rounded-full shadow-sm transition-transform border border-slate-200/50",
+                        color === c.value ? "scale-110 ring-2 ring-zinc-400 ring-offset-1" : "hover:scale-110",
+                        c.value === "" && "bg-white"
+                      )}
+                      style={c.value ? { backgroundColor: c.value } : undefined}
+                      title={c.name}
+                    />
+                  ))}
+                </div>
               </div>
 
               {/* Content */}
@@ -182,7 +226,7 @@ const NoteModal = ({ isOpen, onClose, onSave, initialData, dict, lang }: NoteMod
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder={lang === 'id' ? 'Mulai mengetik di sini...' : 'Start typing here...'}
-                  className="w-full min-h-[160px] p-4 bg-slate-50 border border-slate-100 rounded-2xl text-[13px] font-medium text-slate-600 leading-relaxed placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-300 transition-all resize-none"
+                  className="w-full min-h-[160px] p-4 bg-white/50 backdrop-blur-sm border border-slate-100/60 rounded-2xl text-[13px] font-medium text-slate-700 leading-relaxed placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-300 transition-all resize-none"
                 />
               </div>
 
@@ -197,7 +241,7 @@ const NoteModal = ({ isOpen, onClose, onSave, initialData, dict, lang }: NoteMod
             </div>
 
             {/* Footer */}
-            <div className="px-6 pb-6 pt-2 flex items-center gap-3 bg-white shrink-0">
+            <div className="px-6 pb-6 pt-2 flex items-center gap-3 shrink-0 transition-colors duration-300" style={{ backgroundColor: color || "#ffffff" }}>
               <button
                 onClick={onClose}
                 disabled={loading}

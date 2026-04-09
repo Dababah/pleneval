@@ -8,6 +8,7 @@ import FollowButton from "@/components/dashboard/network/FollowButton";
 import type { Locale } from "@/i18n-config";
 import { getDictionary } from "@/lib/get-dictionary";
 import Link from "next/link";
+import FollowStats from "./FollowStats";
 
 export default async function PublicProfilePage(props: {
   params: Promise<{ lang: Locale; username: string }>;
@@ -27,8 +28,20 @@ export default async function PublicProfilePage(props: {
   const user = await prisma.user.findUnique({
     where: { username: decodedUsername },
     include: {
-      followers: true,
-      following: true,
+      followers: {
+        include: {
+          follower: {
+            select: { id: true, username: true, name: true, image: true }
+          }
+        }
+      },
+      following: {
+        include: {
+          following: {
+            select: { id: true, username: true, name: true, image: true }
+          }
+        }
+      },
       habits: {
         orderBy: { currentStreak: 'desc' },
         take: 3, // Only show top 3 streaks
@@ -86,18 +99,11 @@ export default async function PublicProfilePage(props: {
             <div className="flex-1 pt-2">
               <h1 className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight leading-none">@{user.username}</h1>
               <p className="text-slate-500 font-bold text-sm mt-2 mb-4 uppercase tracking-[0.1em]">{user.name}</p>
-              
-              <div className="flex items-center justify-center md:justify-start gap-6">
-                <div className="text-center md:text-left">
-                  <p className="text-xl md:text-2xl font-black text-zinc-900 leading-none">{user.followers.length}</p>
-                  <p className="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-wider">Followers</p>
-                </div>
-                <div className="w-px h-8 bg-slate-200" />
-                <div className="text-center md:text-left">
-                  <p className="text-xl md:text-2xl font-black text-zinc-900 leading-none">{user.following.length}</p>
-                  <p className="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-wider">Following</p>
-                </div>
-              </div>
+              <FollowStats 
+                followers={user.followers as any} 
+                following={user.following as any} 
+                lang={lang} 
+              />
             </div>
 
             {/* Actions */}

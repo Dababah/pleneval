@@ -47,8 +47,8 @@ export default async function AuthLayout(props: {
 
       {/* Footer Links */}
       <div className="absolute bottom-6 left-0 right-0 z-10 flex justify-center gap-6 text-[9px] text-gray-400 font-medium">
-        <a href="#" className="hover:text-black transition-colors">{dict.layout.terms}</a>
-        <a href="#" className="hover:text-black transition-colors">{dict.layout.privacy}</a>
+        <a href={`/${lang}/terms`} className="hover:text-black transition-colors">{dict.layout.terms}</a>
+        <a href={`/${lang}/privacy`} className="hover:text-black transition-colors">{dict.layout.privacy}</a>
       </div>
     </div>
   );

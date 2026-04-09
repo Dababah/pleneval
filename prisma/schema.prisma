@@ -195,6 +195,11 @@ model Note {
   title     String
   content   String?  @db.Text
   category  String?
+  color       String?
+  colSpan     Int      @default(1) @map("col_span")
+  rowSpan     Int      @default(1) @map("row_span")
+  positionX   Int      @default(0) @map("pos_x")
+  positionY   Int      @default(0) @map("pos_y")
   isPinned  Boolean  @default(false) @map("is_pinned")
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
@@ -209,13 +214,13 @@ model JournalEntry {
   id        String   @id @default(cuid())
   content   String   @db.Text
   mood      String?
-  date      DateTime @unique @default(now())
+  date      DateTime @default(now())
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "journal_entries_user_id_fkey")
+  @@unique([userId, date])
   @@map("journal_entries")
 }
 

@@ -39,10 +39,10 @@ export async function sendOTP(email: string) {
     await transporter.sendMail({
       ...mailOptions,
       to: email,
-      subject: "Your AXION Password Reset OTP",
+      subject: "Your PLEN Password Reset OTP",
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-          <h2 style="color: #2563eb;">AXION Security</h2>
+          <h2 style="color: #2563eb;">PLEN Security</h2>
           <p>Hello,</p>
           <p>You requested a password reset. Use the following 6-digit OTP to proceed:</p>
           <div style="font-size: 32px; font-weight: bold; padding: 20px; background: #f3f4f6; text-align: center; border-radius: 8px; letter-spacing: 5px; color: #000;">
@@ -51,7 +51,7 @@ export async function sendOTP(email: string) {
           <p>This OTP will expire in 10 minutes.</p>
           <p>If you didn't request this, you can safely ignore this email.</p>
           <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #666;">&copy; 2026 AXION Platform. All rights reserved.</p>
+          <p style="font-size: 12px; color: #666;">&copy; 2026 PLEN Platform. All rights reserved.</p>
         </div>
       `,
     });

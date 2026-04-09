@@ -20,10 +20,15 @@ export default async function DashboardLayout(props: {
   if (session?.user?.id) {
     const dbUser = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { username: true }
+      select: { username: true, image: true, name: true }
     });
-    if (dbUser && !dbUser.username) {
-      needsOnboarding = true;
+    if (dbUser) {
+      if (!dbUser.username) {
+        needsOnboarding = true;
+      }
+      // Inject fresh DB values into the session object to override the stale JWT token
+      if (dbUser.image) session.user.image = dbUser.image;
+      if (dbUser.name) session.user.name = dbUser.name;
     }
   }
 

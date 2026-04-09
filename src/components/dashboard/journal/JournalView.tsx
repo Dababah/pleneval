@@ -1,116 +1,200 @@
 "use client";
 
-import React, { useState } from "react";
-import { 
-  BookOpen, 
-  Smile, 
-  Frown, 
-  Meh, 
-  Heart, 
-  Zap,
-  Calendar,
+import React, { useState, useMemo } from "react";
+import useSWR, { mutate } from "swr";
+import { format, startOfDay } from "date-fns";
+import {
+  History,
+  Calendar as CalendarIcon,
+  Search,
+  BookOpen,
+  ArrowRight,
+  TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import JournalEditor from "./JournalEditor";
+import JournalHeatmap from "./JournalHeatmap";
+import JournalArchiveModal from "./JournalArchiveModal";
 
-interface JournalEntry {
-  id: string;
-  content: string;
-  mood: string;
-  createdAt: Date;
-}
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 interface JournalViewProps {
-  initialEntries: JournalEntry[];
+  initialEntries: any[];
   lang: string;
   dict: any;
 }
 
 const JournalView = ({ initialEntries, lang, dict }: JournalViewProps) => {
-  const [entries, setEntries] = useState(initialEntries);
-  const [activeMood, setActiveMood] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState(startOfDay(new Date()));
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
 
-  const moods = [
-    { name: dict.journal.moods.excellent, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
-    { name: dict.journal.moods.great, icon: Zap, color: 'text-amber-500', bg: 'bg-amber-50' },
-    { name: dict.journal.moods.good, icon: Smile, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-    { name: dict.journal.moods.neutral, icon: Meh, color: 'text-slate-500', bg: 'bg-slate-50' },
-    { name: dict.journal.moods.low, icon: Frown, color: 'text-blue-500', bg: 'bg-blue-50' },
-  ];
+  const dateStr = format(selectedDate, "yyyy-MM-dd");
+
+  // SWR for all entries (history & heatmap)
+  const { data: allEntries = [] } = useSWR("/api/journal", fetcher, {
+    fallbackData: initialEntries
+  });
+
+  // SWR for current entry
+  const { data: currentEntry, isLoading } = useSWR(`/api/journal/${dateStr}`, fetcher);
+
+  const handleSave = async (data: { content: string; mood: string | null }) => {
+    try {
+      const res = await fetch(`/api/journal/${dateStr}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        // Mutate both to keep UI in sync
+        mutate("/api/journal");
+        mutate(`/api/journal/${dateStr}`);
+      }
+    } catch (error) {
+      console.error("Save failed", error);
+    }
+  };
+
+  const filteredHistory = useMemo(() => {
+    if (!searchQuery) return allEntries.slice(0, 10);
+    return allEntries.filter((e: any) =>
+      e.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (e.mood && e.mood.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }, [allEntries, searchQuery]);
 
   return (
-    <div className="space-y-4 md:space-y-6">
-      {/* Header & Mood Selection */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-         <div className="lg:col-span-2 p-4 md:p-6 bg-white rounded-xl border border-slate-100 shadow-sm space-y-4 md:space-y-6">
-            <div className="space-y-1">
-               <h2 className="text-base md:text-lg font-bold text-zinc-900 leading-tight">{dict.journal.title}</h2>
-               <p className="text-[11px] md:text-xs text-slate-400 font-normal leading-relaxed">{dict.journal.desc}</p>
-            </div>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
 
-            <div className="space-y-3">
-               <p className="text-[10px] font-medium text-slate-400">How are you feeling today?</p>
-               <div className="grid grid-cols-5 gap-2">
-                  {moods.map((mood) => (
-                    <button 
-                      key={mood.name}
-                      onClick={() => setActiveMood(mood.name)}
-                      className={cn(
-                        "py-2.5 rounded-lg flex flex-col items-center justify-center gap-1.5 border transition-all duration-200",
-                        activeMood === mood.name 
-                          ? `${mood.bg} border-zinc-900 ${mood.color} shadow-sm` 
-                          : "bg-slate-50 border-slate-50 text-slate-300 hover:border-slate-200"
-                      )}
-                    >
-                      <mood.icon size={16} />
-                      <span className="text-[9px] font-semibold">{mood.name}</span>
-                    </button>
-                  ))}
-               </div>
-            </div>
-
-            <div className="space-y-3">
-               <p className="text-[10px] font-medium text-slate-400">{dict.journal.reflection}</p>
-               <textarea 
-                 placeholder="Write about your thoughts..."
-                 className="w-full p-4 rounded-xl bg-slate-50 border border-slate-100 text-xs font-medium placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-300 transition-all resize-none min-h-[120px] md:min-h-[160px]"
-               />
-            </div>
-
-            <button className="w-full py-2.5 bg-zinc-900 text-white rounded-lg text-xs font-semibold shadow-md hover:bg-zinc-800 active:scale-95 transition-all">
-              {dict.journal.saveBtn}
-            </button>
-         </div>
-
-         {/* Side: History Snippet */}
-         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-            <div className="p-4 md:p-5 bg-zinc-900 rounded-xl text-white space-y-4 shadow-md relative overflow-hidden group/card">
-               <div className="absolute top-0 right-0 p-3 opacity-5 pointer-events-none transition-transform group-hover/card:scale-110">
-                  <Calendar size={48} strokeWidth={1} />
-               </div>
-               <div className="flex items-center justify-between opacity-50 relative z-10">
-                  <Calendar size={14} />
-                  <p className="text-[10px] font-semibold">{dict.journal.history}</p>
-               </div>
-               <div className="space-y-2 relative z-10">
-                  <p className="text-sm md:text-base font-bold tracking-tight leading-none">Journal logs</p>
-                  <p className="text-[10px] text-zinc-400 font-medium leading-relaxed">You have recorded 0 entries in the last 7 days.</p>
-               </div>
-               <div className="pt-1 relative z-10">
-                  <button className="w-full py-2 rounded-lg border border-zinc-700 text-[10px] font-semibold hover:bg-zinc-800 transition-all shadow-sm">
-                    {dict.journal.viewArchive}
-                  </button>
-               </div>
-            </div>
-
-            {/* Empty State History */}
-            <div className="p-4 md:p-5 bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center space-y-3 py-6 md:py-8">
-               <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-200 shrink-0">
-                  <BookOpen size={20} />
-               </div>
-               <p className="text-[10px] text-slate-400 font-semibold">{dict.journal.empty}</p>
-            </div>
-         </div>
+      {/* Left Column: Editor (Primary) */}
+      <div className="lg:col-span-8 flex flex-col min-h-[600px]">
+        <JournalEditor
+          selectedDate={selectedDate}
+          initialData={currentEntry || { content: "", mood: null }}
+          onSave={handleSave}
+          dict={dict}
+        />
       </div>
+
+      {/* Right Column: Sidebar (Stats & History) */}
+      <div className="lg:col-span-4 space-y-6">
+
+        {/* Heatmap Card */}
+        <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-indigo-50 text-indigo-500">
+                <TrendingUp size={16} />
+              </div>
+              <h2 className="text-sm font-black text-zinc-900 leading-none">Stats</h2>
+            </div>
+            <button
+              onClick={() => setIsArchiveModalOpen(true)}
+              className="px-3 py-1.5 rounded-lg border border-slate-100 text-[9px] font-black uppercase text-slate-400 hover:bg-slate-50 transition-all"
+            >
+              {dict.journal.viewArchive}
+            </button>
+          </div>
+
+          <JournalHeatmap entries={allEntries} dict={dict} />
+
+          <div className="pt-4 border-t border-slate-50">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Completion</p>
+            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-indigo-500 transition-all duration-1000"
+                style={{ width: `${Math.min((allEntries.length / 30) * 100, 100)}%` }}
+              />
+            </div>
+            <p className="text-[10px] text-slate-500 mt-2 font-medium italic">
+              {dict.journal.historyDesc.replace("{count}", allEntries.length)}
+            </p>
+          </div>
+        </div>
+
+        {/* History / Timeline Card */}
+        <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col h-[400px]">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-slate-900 text-white">
+                <History size={16} />
+              </div>
+              <h2 className="text-sm font-black text-zinc-900 leading-none">{dict.journal.history}</h2>
+            </div>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative mb-4 group">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-zinc-900 transition-colors" />
+            <input
+              type="text"
+              placeholder="Find in logs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border-none rounded-2xl text-xs font-medium focus:ring-2 focus:ring-zinc-900/5 transition-all"
+            />
+          </div>
+
+          {/* List */}
+          <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
+            {filteredHistory.length > 0 ? (
+              filteredHistory.map((entry: any, i: number) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedDate(startOfDay(new Date(entry.date)))}
+                  className={cn(
+                    "w-full p-3 rounded-2xl text-left transition-all border group",
+                    format(selectedDate, "yyyy-MM-dd") === format(new Date(entry.date), "yyyy-MM-dd")
+                      ? "bg-zinc-900 border-zinc-900 shadow-lg shadow-zinc-200"
+                      : "bg-slate-50 border-transparent hover:bg-white hover:border-slate-200"
+                  )}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className={cn(
+                      "text-[10px] font-black uppercase tracking-wider",
+                      format(selectedDate, "yyyy-MM-dd") === format(new Date(entry.date), "yyyy-MM-dd") ? "text-zinc-500" : "text-slate-400"
+                    )}>
+                      {format(new Date(entry.date), "MMM d, yyyy")}
+                    </p>
+                    {entry.mood && (
+                      <span className="text-xs">{entry.mood === dict.journal.moods.excellent ? '❤️' : entry.mood === dict.journal.moods.great ? '⚡' : '😊'}</span>
+                    )}
+                  </div>
+                  <p className={cn(
+                    "text-xs font-medium line-clamp-2 leading-relaxed",
+                    format(selectedDate, "yyyy-MM-dd") === format(new Date(entry.date), "yyyy-MM-dd") ? "text-zinc-200" : "text-zinc-600"
+                  )}>
+                    {entry.content}
+                  </p>
+                </button>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-30">
+                <BookOpen size={32} />
+                <p className="text-xs font-bold">{dict.journal.empty}</p>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => setIsArchiveModalOpen(true)}
+            className="w-full mt-4 py-2.5 rounded-xl border border-dashed border-slate-200 text-[10px] font-black uppercase text-slate-400 hover:border-slate-400 hover:text-slate-600 transition-all flex items-center justify-center gap-2"
+          >
+            {dict.journal.viewArchive} <ArrowRight size={12} />
+          </button>
+        </div>
+      </div>
+
+      {/* Archive Modal */}
+      <JournalArchiveModal
+        isOpen={isArchiveModalOpen}
+        onClose={() => setIsArchiveModalOpen(false)}
+        entries={allEntries}
+        onSelectDate={(date) => setSelectedDate(startOfDay(date))}
+        lang={lang}
+        dict={dict}
+      />
     </div>
   );
 };

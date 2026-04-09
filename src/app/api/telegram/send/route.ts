@@ -37,9 +37,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Bot Token atau Chat ID tidak valid' }, { status: 400 });
     }
 
-    let text = message || "Halo! Bot Anda sudah terhubung dengan AXION.";
+    let text = message || "Halo! Bot Anda sudah terhubung dengan PLEN.";
     if (test) {
-       text = "🚀 *Test Berhasil!*\n\nBot Telegram Anda sekarang terhubung dengan AXION Personal Assistant.\n\nAnda akan menerima notifikasi otomatis sesuai pengaturan Anda.";
+       text = "🚀 *Test Berhasil!*\n\nBot Telegram Anda sekarang terhubung dengan PLEN Personal Assistant.\n\nAnda akan menerima notifikasi otomatis sesuai pengaturan Anda.";
     }
 
     const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {

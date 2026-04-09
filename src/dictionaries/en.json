@@ -66,38 +66,40 @@
     "register": "Register"
   },
   "landing": {
-    "badge": "Introducing AXION v1.0",
-    "heroTitle": "The Future of <span className='bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400'>Secure Authentication</span> For Your Business.",
-    "heroSubtitle": "One platform for all your login needs. Fast, secure, and incredibly easy to integrate with modern tech stacks.",
-    "getStarted": "Start Free Now",
-    "viewDemo": "View Demo",
-    "featuresTitle": "Our Top Features",
-    "featuresSubtitle": "Build amazing authentication experiences without worrying about security infrastructure.",
+    "badge": "Premium Architecture",
+    "heroTitle": "PLEN.",
+    "heroSubtitle": "Experience a kinetic curation of digital space. Precision engineered for the minimalist mind.",
+    "getStarted": "Start Journey",
+    "viewDemo": "Explore Features",
+    "featuresTitle": "Engineered for Perfection.",
+    "featuresSubtitle": "We've redefined the boundary between function and form. Every interaction is weighted with purpose.",
     "features": [
       {
-        "title": "Maximum Security",
-        "desc": "End-to-end encryption with the latest industry security standards."
+        "title": "Kinetic Curation",
+        "desc": "Intelligence that adapts to your workflow, surfacing what matters precisely when you need it."
       },
       {
-        "title": "Lightning Performance",
-        "desc": "Optimized data access speed for the best user experience."
+        "title": "Absolute Security",
+        "desc": "Encrypted at every touchpoint. Your data remains your sanctuary, protected by industry-leading protocols."
       },
       {
-        "title": "Global Access",
-        "desc": "Popular social login integration like Google and GitHub."
+        "title": "Instant Velocity",
+        "desc": "Zero latency transitions and hyper-responsive controls that match the speed of your creative thought."
       }
     ],
-    "ctaTitle": "Ready to Get Started?",
-    "ctaSubtitle": "Join thousands of developers who have entrusted their authentication systems to us.",
-    "ctaFeatures": [
-      "Free for 1,000 Users",
-      "24/7 Support",
-      "Quick 5-Minute Setup"
-    ],
-    "ctaButton": "Create Free Account"
+    "bento": {
+      "title": "Master the Flow",
+      "desc": "Every element of PLEN is designed to disappear, leaving only your work in sharp focus.",
+      "editorial": "Editorial Precision",
+      "editorialDesc": "Typography-first design that honors the hierarchy of information above all else.",
+      "waitlist": "Join the waitlist for v2.0"
+    },
+    "ctaTitle": "The future is functional.",
+    "ctaButton": "Get Early Access",
+    "backToHome": "Back to Home"
   },
   "footer": {
-    "copyright": "© 2026 AXION. All rights reserved.",
+    "copyright": "© 2026 PLEN. All rights reserved.",
     "about": "About Us",
     "privacy": "Privacy",
     "terms": "Terms & Conditions"
@@ -117,7 +119,21 @@
     "calendarBtn": "Open calendar",
     "goalProgress": "Goal progress",
     "overallCompletion": "Overall completion",
-    "viewMilestones": "View milestones"
+    "viewMilestones": "View milestones",
+    "widgets": {
+      "todayFocus": "Today's Focus",
+      "habitTracker": "Habit Tracker",
+      "financialHealth": "Financial Health",
+      "activeGoals": "Active Goals",
+      "allClear": "All clear! No pending items for today.",
+      "monthlySpending": "Monthly Spending",
+      "budgetUsed": "{percent}% of budget used",
+      "budgetExceeded": "Budget Exceeded",
+      "done": "Done",
+      "asap": "ASAP",
+      "noHabits": "No habits set.",
+      "failedLoad": "Failed to load neural grid data."
+    }
   },
   "finance": {
     "title": "Finance Management",
@@ -367,7 +383,8 @@
       "telegram": "TELEGRAM BOT",
       "language": "LANGUAGE",
       "connections": "CONNECTIONS",
-      "profile": "EDIT PROFILE"
+      "profile": "EDIT PROFILE",
+      "support": "SUPPORT & CONTACT"
     },
     "profile": {
       "title": "USER PROFILE IDENTITY",
@@ -379,6 +396,23 @@
       "success": "Profile updated successfully!",
       "error": "Failed to update profile",
       "usernameTaken": "Username is already taken"
+    },
+    "support": {
+      "title": "SUPPORT & CONTACT US",
+      "subtitle": "Support the creator or send feedback for this application.",
+      "creatorSupport": "Support Creator (QRIS)",
+      "contactTitle": "Contact Us",
+      "form": {
+        "name": "Full Name",
+        "email": "Email Address",
+        "message": "Suggestion or Message",
+        "images": "Attach Images (Max 3)",
+        "submit": "Send Suggestion",
+        "success": "Thank you! Your feedback is very meaningful for this application's development.",
+        "sending": "Sending...",
+        "maxImagesError": "Maximum 3 images only.",
+        "sizeError": "Maximum image size is 1MB."
+      }
     },
     "connections": {
       "title": "MANAGE CONNECTIONS & ACCOUNTS",
@@ -579,6 +613,23 @@
     "logs": "Journal Logs",
     "historyDesc": "You have recorded {count} entries in the last 7 days.",
     "viewArchive": "View Archive",
+    "promptBtn": "Need inspiration?",
+    "saving": "Saving draft...",
+    "saved": "All changes saved",
+    "heatmap": {
+      "title": "Consistency Heatmap",
+      "less": "Less",
+      "more": "More"
+    },
+    "prompts": [
+      "What was the best part of your day?",
+      "What is one thing you learned today?",
+      "What are you grateful for right now?",
+      "What challenged you today and how did you handle it?",
+      "What is one goal for tomorrow?",
+      "Who made you smile today?",
+      "What do you want to remember about today in a year?"
+    ],
     "empty": "No recent logs",
     "moods": {
       "excellent": "Excellent",
@@ -615,5 +666,17 @@
     "emptyState": "Hello! I am your personal financial assistant. How can I help you today?",
     "error": "Sorry, an error occurred while connecting to the AI.",
     "thinking": "Thinking..."
+  },
+  "about": {
+    "title": "ABOUT PLEN",
+    "subtitle": "The Story Behind a Student's Chaotic Schedule",
+    "story": {
+      "title": "Born from 20-Year-Old Struggles",
+      "p1": "Being a 20-year-old college student is tough. Between piling assignments, time-consuming organization meetings, and future ambitions that often cause anxiety—life feels like a tangled mess that's hard to unravel.",
+      "p2": "PLEN was born not just as lines of code, but as an escape from my own chaotic schedule. I needed something more than just a calendar; I needed an assistant that understands how precious every minute is amidst overwhelming busyness.",
+      "p3": "Created with the spirit of helping fellow 'busyness warriors', PLEN is here to bring calm amidst your storm of activities. Let's organize life, one premium step at a time."
+    },
+    "mission": "Our Mission",
+    "missionText": "Empowering individuals to reach their maximum potential through smart, aesthetic, and AI-driven life organization."
   }
 }

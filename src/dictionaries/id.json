@@ -66,38 +66,40 @@
     "register": "Daftar"
   },
   "landing": {
-    "badge": "Memperkenalkan AXION v1.0",
-    "heroTitle": "Masa Depan <span className='bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400'>Autentikasi Aman</span> Untuk Bisnis Anda.",
-    "heroSubtitle": "Satu platform untuk semua kebutuhan login Anda. Cepat, aman, dan sangat mudah diintegrasikan dengan tumpukan teknologi modern.",
-    "getStarted": "Mulai Gratis Sekarang",
-    "viewDemo": "Lihat Demo",
-    "featuresTitle": "Fitur Unggulan Kami",
-    "featuresSubtitle": "Bangun pengalaman autentikasi yang luar biasa tanpa khawatir tentang infrastruktur keamanan.",
+    "badge": "Arsitektur Premium",
+    "heroTitle": "PLEN.",
+    "heroSubtitle": "Rasakan kurasi kinetik ruang digital. Direkayasa secara presisi untuk pikiran minimalis.",
+    "getStarted": "Mulai Perjalanan",
+    "viewDemo": "Jelajahi Fitur",
+    "featuresTitle": "Dirancang untuk Kesempurnaan.",
+    "featuresSubtitle": "Kami mendefinisikan ulang batas antara fungsi dan bentuk. Setiap interaksi berbobot dengan tujuan.",
     "features": [
       {
-        "title": "Keamanan Maksimal",
-        "desc": "Enkripsi end-to-end dengan standar keamanan industri terbaru."
+        "title": "Kurasi Kinetik",
+        "desc": "Kecerdasan yang beradaptasi dengan alur kerja Anda, memunculkan apa yang penting tepat saat Anda membutuhkannya."
       },
       {
-        "title": "Performa Kilat",
-        "desc": "Kecepatan akses data yang dioptimalkan untuk pengalaman pengguna terbaik."
+        "title": "Keamanan Mutlak",
+        "desc": "Terenkripsi di setiap titik sentuh. Data Anda tetap menjadi tempat perlindungan Anda, dilindungi oleh protokol industri terkemuka."
       },
       {
-        "title": "Akses Global",
-        "desc": "Integrasi login sosial populer seperti Google dan GitHub."
+        "title": "Kecepatan Instan",
+        "desc": "Transisi tanpa jeda dan kontrol yang sangat responsif yang sesuai dengan kecepatan pemikiran kreatif Anda."
       }
     ],
-    "ctaTitle": "Siap untuk Memulai?",
-    "ctaSubtitle": "Bergabunglah dengan ribuan pengembang yang telah mempercayakan sistem autentikasi mereka kepada kami.",
-    "ctaFeatures": [
-      "Gratis untuk 1.000 Pengguna",
-      "Dukungan 24/7",
-      "Penyiapan Cepat 5 Menit"
-    ],
-    "ctaButton": "Buat Akun Gratis"
+    "bento": {
+      "title": "Kuasai Aliran",
+      "desc": "Setiap elemen PLEN dirancang untuk menghilang, membiarkan pekerjaan Anda tetap dalam fokus tajam.",
+      "editorial": "Presisi Editorial",
+      "editorialDesc": "Desain yang mengutamakan tipografi yang menghormati hierarki informasi di atas segalanya.",
+      "waitlist": "Bergabunglah dengan waitlist v2.0"
+    },
+    "ctaTitle": "Masa depan adalah fungsional.",
+    "ctaButton": "Dapatkan Akses Awal",
+    "backToHome": "Kembali ke Beranda"
   },
   "footer": {
-    "copyright": "© 2026 AXION. Hak cipta dilindungi undang-undang.",
+    "copyright": "© 2026 PLEN. Hak cipta dilindungi undang-undang.",
     "about": "Tentang Kami",
     "privacy": "Privasi",
     "terms": "Syarat & Ketentuan"
@@ -117,7 +119,21 @@
     "calendarBtn": "Buka kalender",
     "goalProgress": "Kemajuan target",
     "overallCompletion": "Penyelesaian keseluruhan",
-    "viewMilestones": "Lihat milstone"
+    "viewMilestones": "Lihat milstone",
+    "widgets": {
+      "todayFocus": "Fokus Hari Ini",
+      "habitTracker": "Pelacak Kebiasaan",
+      "financialHealth": "Kesehatan Finansial",
+      "activeGoals": "Target Aktif",
+      "allClear": "Semua beres! Tidak ada agenda hari ini.",
+      "monthlySpending": "Pengeluaran Bulan Ini",
+      "budgetUsed": "{percent}% budget terpakai",
+      "budgetExceeded": "Budget Terlampaui",
+      "done": "Selesai",
+      "asap": "Segera",
+      "noHabits": "Belum ada kebiasaan.",
+      "failedLoad": "Gagal memuat data grid neural."
+    }
   },
   "finance": {
     "title": "Manajemen Keuangan",
@@ -367,7 +383,8 @@
       "telegram": "BOT TELEGRAM",
       "language": "BAHASA",
       "connections": "KONEKSI",
-      "profile": "EDIT PROFIL"
+      "profile": "EDIT PROFIL",
+      "support": "DUKUNGAN & KONTAK"
     },
     "profile": {
       "title": "IDENTITAS PROFIL PENGGUNA",
@@ -379,6 +396,23 @@
       "success": "Profil berhasil diperbarui!",
       "error": "Gagal memperbarui profil",
       "usernameTaken": "Username sudah digunakan"
+    },
+    "support": {
+      "title": "DUKUNGAN & HUBUNGI KAMI",
+      "subtitle": "Dukung kreator atau kirim saran untuk aplikasi ini.",
+      "creatorSupport": "Dukung Kreator (QRIS)",
+      "contactTitle": "Hubungi Kami",
+      "form": {
+        "name": "Nama Lengkap",
+        "email": "Alamat Email",
+        "message": "Saran atau Pesan",
+        "images": "Lampirkan Gambar (Maks 3)",
+        "submit": "Kirim Saran",
+        "success": "Terima kasih! Saran Anda sangat berarti bagi pengembangan aplikasi ini.",
+        "sending": "Mengirim...",
+        "maxImagesError": "Maksimal 3 gambar saja.",
+        "sizeError": "Ukuran gambar maksimal 1MB."
+      }
     },
     "connections": {
       "title": "KELOLA KONEKSI & AKUN",
@@ -579,6 +613,23 @@
     "logs": "Log Jurnal",
     "historyDesc": "Anda telah mencatat {count} entri dalam 7 hari terakhir.",
     "viewArchive": "Lihat Arsip",
+    "promptBtn": "Butuh inspirasi?",
+    "saving": "Menyimpan draf...",
+    "saved": "Semua perubahan disimpan",
+    "heatmap": {
+      "title": "Heatmap Konsistensi",
+      "less": "Kurang",
+      "more": "Lebih"
+    },
+    "prompts": [
+      "Apa bagian terbaik dari hari Anda?",
+      "Apa satu hal yang Anda pelajari hari ini?",
+      "Apa yang Anda syukuri saat ini?",
+      "Apa tantangan hari ini dan bagaimana Anda menghadapinya?",
+      "Apa satu tujuan untuk besok?",
+      "Siapa yang membuat Anda tersenyum hari ini?",
+      "Apa yang ingin Anda ingat tentang hari ini dalam satu tahun?"
+    ],
     "empty": "Tidak ada log terbaru",
     "moods": {
       "excellent": "Sangat Baik",
@@ -615,5 +666,17 @@
     "emptyState": "Halo! Saya asisten keuangan pribadi Anda. Ada yang bisa saya bantu hari ini?",
     "error": "Maaf, terjadi kesalahan saat terhubung ke AI.",
     "thinking": "Sedang berpikir..."
+  },
+  "about": {
+    "title": "TENTANG PLEN",
+    "subtitle": "Kisah di Balik Kekacauan Jadwal Mahasiswa",
+    "story": {
+      "title": "Lahir dari Keluh Kesah Umur 20",
+      "p1": "Menjadi mahasiswa umur 20 tahun itu berat. Antara tugas kuliah yang menumpuk, rapat organisasi yang menyita waktu, hingga ambisi masa depan yang seringkali membuat cemas—hidup terasa seperti benang kusut yang sulit diurai.",
+      "p2": "PLEN lahir bukan hanya sebagai barisan kode, melainkan sebuah pelarian dari kekacauan jadwal saya sendiri. Saya butuh sesuatu yang lebih dari sekadar kalender; saya butuh asisten yang mengerti betapa berharganya setiap menit di tengah kesibukan yang luar biasa.",
+      "p3": "Dibuat dengan semangat untuk membantu sesama pejuang kesibukan, PLEN hadir untuk membawa ketenangan di tengah badai aktivitas Anda. Mari menata hidup, satu langkah lebih premium setiap harinya."
+    },
+    "mission": "Misi Kami",
+    "missionText": "Memberdayakan individu untuk mencapai potensi maksimal mereka melalui pengorganisasian hidup yang cerdas, estetis, dan berbasis AI."
   }
 }

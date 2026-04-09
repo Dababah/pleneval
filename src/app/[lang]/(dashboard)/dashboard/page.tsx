@@ -3,13 +3,16 @@ import { getDictionary } from "@/lib/get-dictionary";
 import type { Locale } from "@/i18n-config";
 import { redirect } from "next/navigation";
 import { 
-  CheckCircle2, 
   Calendar as CalendarIcon, 
-  TrendingUp,
   ArrowUpRight,
-  MoreHorizontal
+  Sparkles
 } from "lucide-react";
 import Link from "next/link";
+import { getDashboardData } from "@/lib/actions/dashboard";
+import TodayFocus from "@/components/dashboard/widgets/TodayFocus";
+import QuickHabit from "@/components/dashboard/widgets/QuickHabit";
+import FinanceCard from "@/components/dashboard/widgets/FinanceCard";
+import GoalSimplified from "@/components/dashboard/widgets/GoalSimplified";
 
 export default async function DashboardPage(props: {
   params: Promise<{ lang: Locale }>;
@@ -18,110 +21,117 @@ export default async function DashboardPage(props: {
   const lang = params.lang;
   const session = await auth();
 
-  if (!session) {
+  const userId = session?.user?.id;
+  if (!session || !userId) {
     redirect(`/${lang}/login`);
   }
 
   const user = session.user;
   const dict = await getDictionary(lang);
+  const data = await getDashboardData(userId);
 
-  // Mock stats
-  const stats = {
-    tasksToday: 0,
-    upcomingEvents: 0,
-    goalsActive: 0,
-    overallProgress: 0
-  };
+  if (!data) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">{dict.dashboard.widgets.failedLoad}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full animate-in fade-in zoom-in duration-700 h-full overflow-hidden">
-      <div className="mb-6 flex items-end justify-between">
+    <div className="w-full animate-in fade-in zoom-in duration-700 h-full pb-10">
+      {/* Header Section */}
+      <div className="mb-10 flex items-start justify-between">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-zinc-900 mb-0.5 leading-none">
-            {dict.dashboard.title}
-          </h1>
-          <p className="text-[11px] text-slate-400 font-medium">
-            {dict.dashboard.welcome.replace('{name}', user?.name?.split(' ')[0] || 'User')}
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-2xl md:text-3xl font-black text-zinc-900 leading-none uppercase tracking-tighter">
+              {dict.dashboard.title}
+            </h1>
+            <Sparkles size={18} className="text-amber-400 fill-amber-400" />
+          </div>
+          <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest leading-none">
+            {dict.dashboard.welcome.replace('{name}', user?.name?.split(' ')[0] || 'User')} • {dict.dashboard.status}
           </p>
         </div>
+        
         <div className="text-right hidden md:block">
-           <p className="text-[10px] font-bold text-zinc-900 leading-none mb-1">
+           <p className="text-[10px] font-black text-zinc-900 leading-none mb-1 uppercase tracking-tight">
              {new Date().toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
            </p>
-           <p className="text-[9px] text-slate-400 font-medium">{dict.dashboard.status}</p>
+           <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-[0.2em] opacity-50">{lang === 'id' ? 'Sinkronisasi Aktif' : 'Sync Active'}</p>
         </div>
       </div>
 
-      {/* Dashboard Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      {/* Grid Layout: Command Center */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         
-        {/* Main Column */}
-        <div className="lg:col-span-2 space-y-4 md:space-y-6">
-          {/* Today's Focus Card */}
-          <div className="p-5 md:p-6 rounded-xl bg-white border border-slate-100 shadow-sm space-y-4 md:space-y-6 hover:border-zinc-300 transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <h2 className="text-base md:text-lg font-bold text-zinc-900">{dict.dashboard.focus}</h2>
-                <p className="text-[11px] text-slate-400 font-normal">
-                  {dict.dashboard.tasksPending.replace('{count}', stats.tasksToday.toString())}
-                </p>
-              </div>
-              <Link href={`/${lang}/tasks`} className="w-8 h-8 rounded-lg bg-zinc-50 border border-slate-100 flex items-center justify-center text-zinc-400 hover:bg-zinc-900 hover:text-white transition-all">
-                <ArrowUpRight size={16} />
-              </Link>
-            </div>
-
-            {/* Task Quick List Placeholder */}
-            <div className="p-6 rounded-xl bg-slate-50 border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-2 py-8">
-              <CheckCircle2 size={20} className="text-slate-300" />
-              <p className="text-[11px] font-semibold text-slate-400">{dict.dashboard.noTasks}</p>
-              <Link href={`/${lang}/tasks`} className="text-[10px] font-bold text-zinc-900 hover:underline">{dict.dashboard.addTask}</Link>
-            </div>
+        {/* Main Column (8/12) */}
+        <div className="lg:col-span-8 space-y-6 lg:space-y-8">
+          
+          {/* Top Row: Compact Finance Card */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FinanceCard 
+              spent={data.finance.spent} 
+              budget={data.finance.budget} 
+              dict={dict} 
+            />
+            {/* Empty space or future small widget */}
           </div>
 
-          {/* Additional cards grouping or expanded charts would go here */}
+          {/* Second Row in Main: Today's Focus & Habits */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TodayFocus 
+              courses={data.courses} 
+              tasks={data.tasks} 
+              dict={dict} 
+            />
+            <QuickHabit 
+              habits={data.habits} 
+              dict={dict} 
+            />
+          </div>
+
         </div>
 
-        {/* Side Column */}
-        <div className="space-y-4 md:space-y-6">
+        {/* Sidebar Column (4/12) */}
+        <div className="lg:col-span-4 space-y-6 lg:space-y-8">
           
           {/* Upcoming Event Snippet */}
-          <div className="p-5 md:p-6 rounded-xl bg-white border border-slate-100 shadow-sm space-y-4">
+          <div className="p-6 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/50 space-y-5">
             <div className="flex items-center justify-between">
-              <p className="text-[10px] font-semibold text-slate-400">{dict.dashboard.upcoming}</p>
-              <CalendarIcon size={14} className="text-slate-300" />
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{dict.dashboard.upcoming}</p>
+              <CalendarIcon size={16} className="text-slate-200" />
             </div>
-            <div className="space-y-1">
-              <p className="text-xs font-bold text-zinc-900">{dict.dashboard.schedule}</p>
-              <p className="text-[10px] text-slate-400 font-medium">{dict.dashboard.noEvents}</p>
+            
+            <div className="space-y-4">
+              {data.events.length === 0 ? (
+                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{dict.dashboard.noEvents}</p>
+              ) : (
+                data.events.map((event, idx) => (
+                  <div key={event.id} className="flex gap-3">
+                    <div className="w-1 bg-zinc-900 rounded-full" />
+                    <div className="space-y-0.5">
+                      <p className="text-[11px] font-bold text-zinc-900 uppercase tracking-tight">{event.title}</p>
+                      <p className="text-[9px] text-slate-400 font-medium tracking-wide">
+                        {new Date(event.start).toLocaleDateString(lang, { day: 'numeric', month: 'short' })} • {new Date(event.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-            <Link href={`/${lang}/calendar`} className="block w-full py-2.5 text-center rounded-lg bg-zinc-900 text-white text-[10px] font-semibold shadow-md hover:bg-zinc-800 transition-colors">
-              Open calendar
+
+            <Link href={`/${lang}/calendar`} className="flex items-center justify-center gap-2 w-full py-3.5 text-center rounded-2xl bg-zinc-50 border border-slate-100 text-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-900 hover:text-white transition-all shadow-sm">
+              {dict.dashboard.calendarBtn} <ArrowUpRight size={14} />
             </Link>
           </div>
 
-          {/* Progress Tracker */}
-          <div className="p-5 md:p-6 rounded-xl bg-zinc-900 text-white shadow-md space-y-4">
-             <div className="flex items-center justify-between">
-              <TrendingUp size={16} className="text-zinc-500" />
-              <p className="text-[10px] font-semibold text-zinc-500">{dict.dashboard.goalProgress}</p>
-            </div>
-            <div className="space-y-3">
-               <div className="flex items-end justify-between leading-none">
-                  <p className="text-2xl font-bold tracking-tight">{stats.overallProgress}%</p>
-                  <p className="text-[9px] text-zinc-500 font-medium">{dict.dashboard.overallCompletion}</p>
-               </div>
-               <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-white transition-all duration-1000 ease-out" 
-                    style={{ width: `${stats.overallProgress}%` }} 
-                  />
-               </div>
-            </div>
-            <Link href={`/${lang}/goals`} className="flex items-center justify-center gap-2 text-[9px] font-semibold text-zinc-500 hover:text-white transition-colors">
-              {dict.dashboard.viewMilestones} <MoreHorizontal size={10} />
-            </Link>
-          </div>
+          {/* Goals Progress Widget */}
+          <GoalSimplified 
+            goals={data.goals} 
+            lang={lang} 
+            dict={dict}
+          />
 
         </div>
 

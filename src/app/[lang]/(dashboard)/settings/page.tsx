@@ -1,6 +1,7 @@
 import { getDictionary } from "@/lib/get-dictionary";
 import SettingsView from "@/components/dashboard/profile/SettingsView";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Locale } from "@/i18n-config";
 

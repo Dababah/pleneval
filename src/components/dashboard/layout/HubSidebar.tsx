@@ -142,7 +142,7 @@ export default function HubSidebar({
           <div className="p-8 border-t border-slate-50">
             <div className="flex items-center justify-center gap-3">
               <div className="h-px bg-slate-100 flex-1" />
-              <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.3em] text-center whitespace-nowrap">Axion Hub v2</p>
+              <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.3em] text-center whitespace-nowrap">Plen Hub v2</p>
               <div className="h-px bg-slate-100 flex-1" />
             </div>
           </div>

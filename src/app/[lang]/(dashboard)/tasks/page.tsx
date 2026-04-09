@@ -34,7 +34,7 @@ export default function TasksPage({
   if (!dict) return (
      <div className="py-40 flex flex-col items-center justify-center space-y-6">
         <div className="w-12 h-12 rounded-2xl border-4 border-slate-50 border-t-zinc-900 animate-spin shadow-lg" />
-        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] animate-pulse">Initializing Axion Core...</p>
+        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] animate-pulse">Initializing Plen Core...</p>
      </div>
   );
 
