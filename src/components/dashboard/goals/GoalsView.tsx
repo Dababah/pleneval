@@ -20,152 +20,99 @@ import {
   Loader2,
   X,
   Sparkles,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-import GoalModal from "./GoalModal";
-import ConfirmModal from "@/components/ui/ConfirmModal";
-
-interface Milestone {
-  id: string;
-  title: string;
-  isCompleted: boolean;
-}
-
-interface Goal {
-  id: string;
-  title: string;
-  description?: string | null;
-  targetDate?: string | Date | null;
-  progress: number;
-  milestones: Milestone[];
-  createdAt: string | Date;
-}
-
-interface GoalsViewProps {
+                  <div className="mt-3 w-full flex items-center justify-between py-2 px-3 bg-slate-50/80 rounded-lg transition-all">
+                    <div className="flex items-center gap-2">
+                      <Flag size={11} className="text-slate-400" />
+                      <span className="text-[10px] font-semibold text-slate-500">
+                        {dict.goals?.milestones || "Milestones"}
+                      </span>
+                      <span className="text-[10px] font-bold text-zinc-900">
+                        {completedMilestones}/{goal.milestones.length}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-400">{dict.goals?.alwaysVisible || "Visible"}</div>
+                  </div>
   initialGoals: Goal[];
-  lang: string;
-  dict: Record<string, any>;
-}
+                {/* Always-visible Milestones (non-dropdown) */}
+                <div className="px-4 md:px-5 pb-4 md:pb-5 space-y-1.5">
+                  {goal.milestones.map((ms) => (
+                    <div
+                      key={ms.id}
+                      className="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-100/50 hover:bg-white hover:border-slate-200 transition-all group/ms"
+                    >
+                      <button
+                        onClick={() =>
+                          handleToggleMilestone(goal.id, ms.id, !ms.isCompleted)
+                        }
+                        disabled={loadingStates[ms.id]}
+                        className={cn(
+                          "w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
+                          ms.isCompleted
+                            ? "bg-emerald-500 border-emerald-500 text-white"
+                            : "border-slate-300 hover:border-zinc-700"
+                        )}
+                      >
+                        {loadingStates[ms.id] ? (
+                          <Loader2 size={8} className="animate-spin text-slate-400" />
+                        ) : (
+                          ms.isCompleted && <CheckCircle2 size={8} strokeWidth={3} />
+                        )}
+                      </button>
+                      <p
+                        className={cn(
+                          "text-[11px] font-medium flex-1 truncate",
+                          ms.isCompleted ? "text-slate-400 line-through" : "text-zinc-800"
+                        )}
+                      >
+                        {ms.title}
+                      </p>
+                      <button
+                        onClick={() => handleDeleteMilestone(goal.id, ms.id)}
+                        disabled={loadingStates[ms.id]}
+                        className="opacity-0 group-hover/ms:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all"
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                  ))}
 
-// Circular progress ring component
-const ProgressRing = ({
-  progress,
-  milestoneCount,
-  size = 56,
-  strokeWidth = 4,
-}: {
-  progress: number;
-  milestoneCount: number;
-  size?: number;
-  strokeWidth?: number;
-}) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const hasMilestones = milestoneCount > 0;
-  const offset =
-    circumference -
-    (hasMilestones ? (progress / 100) * circumference : circumference);
-
-  return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          className="text-slate-100"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          className={cn(
-            "transition-all duration-1000 ease-out",
-            !hasMilestones
-              ? "text-slate-200"
-              : progress === 100
-                ? "text-emerald-500"
-                : progress >= 60
-                  ? "text-zinc-900"
-                  : progress >= 30
-                    ? "text-amber-500"
-                    : "text-slate-400",
-          )}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span
-          className={cn(
-            "font-bold leading-none",
-            !hasMilestones ? "text-slate-300" : "text-zinc-900",
-            size >= 56 ? "text-xs" : "text-[9px]",
-          )}>
-          {hasMilestones ? `${progress}%` : "—"}
-        </span>
-      </div>
-    </div>
-  );
-};
-
-type StatusFilter =
-  | "all"
-  | "in_progress"
-  | "completed"
-  | "paused"
-  | "overdue"
-  | "no_milestones";
-
-const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
-  const [goals, setGoals] = useState<Goal[]>(initialGoals);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [menuOpen, setMenuOpen] = useState<string | null>(null);
-  const [expandedGoal, setExpandedGoal] = useState<string | null>(null);
-  const [newMilestoneText, setNewMilestoneText] = useState<
-    Record<string, string>
-  >({});
-  const [addingMilestone, setAddingMilestone] = useState<string | null>(null);
-  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
-    {},
-  );
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => setMenuOpen(null);
-    if (menuOpen) {
-      window.addEventListener("click", handleClickOutside);
-    }
-    return () => window.removeEventListener("click", handleClickOutside);
-  }, [menuOpen]);
-
-  // Determine goal status
-  const getGoalStatus = useCallback((goal: Goal): StatusFilter => {
-    if (goal.milestones.length === 0) return "no_milestones";
-    if (goal.progress === 100) return "completed";
-    if (goal.targetDate) {
-      const target = new Date(goal.targetDate);
-      if (target < new Date() && goal.progress < 100) return "overdue";
-    }
-    return "in_progress";
-  }, []);
-
-  // Calculate stats
-  const stats = {
-    total: goals.length,
-    active: goals.filter((g) => getGoalStatus(g) === "in_progress").length,
-    completed: goals.filter((g) => g.progress === 100).length,
+                  {/* Add Milestone */}
+                  {addingMilestone === goal.id ? (
+                    <div className="flex items-center gap-2 p-2">
+                      <input
+                        autoFocus
+                        value={newMilestoneText[goal.id] || ""}
+                        onChange={(e) =>
+                          setNewMilestoneText((prev) => ({ ...prev, [goal.id]: e.target.value }))
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddMilestone(goal.id);
+                          if (e.key === "Escape") setAddingMilestone(null);
+                        }}
+                        placeholder={dict.goals?.milestonePlaceholder || "e.g. Complete chapter 1..."}
+                        className="flex-1 text-[11px] font-medium text-zinc-900 placeholder:text-slate-300 bg-transparent focus:outline-none"
+                      />
+                      <button
+                        onClick={() => handleAddMilestone(goal.id)}
+                        disabled={loadingStates[`add_${goal.id}`] || !newMilestoneText[goal.id]?.trim()}
+                        className="px-3 py-1 bg-zinc-900 text-white rounded-md text-[10px] font-semibold disabled:opacity-50 hover:bg-zinc-800 transition-all flex items-center gap-1"
+                      >
+                        {loadingStates[`add_${goal.id}`] ? <Loader2 size={10} className="animate-spin" /> : "Add"}
+                      </button>
+                      <button onClick={() => setAddingMilestone(null)} className="p-1 text-slate-400 hover:text-zinc-900 transition-colors">
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setAddingMilestone(goal.id)}
+                      className="w-full py-10 text-center text-[44px] font-medium text-slate-400 border border-dashed border-slate-200 rounded-lg hover:border-zinc-300 hover:text-zinc-900 transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <Plus size={44} />
+                      {dict.goals?.addMilestone || "Add Milestone"}
+                    </button>
+                  )}
+                </div>
     overdue: goals.filter((g) => getGoalStatus(g) === "overdue").length,
     noMilestones: goals.filter((g) => g.milestones.length === 0).length,
   };
