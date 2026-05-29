@@ -4,7 +4,10 @@ import { auth } from "@/auth";
 
 export async function PUT(req: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
+  const userId = session?.user?.id;
+
+  // 1. Validasi ketat di awal, jika lolos maka userId dijamin 100% bertipe string
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -16,11 +19,11 @@ export async function PUT(req: Request) {
     }
 
     // Execute bulk updates in a transaction
-    const updates = layouts.map((item) => 
+    const updates = layouts.map((item) =>
       prisma.note.update({
-        where: { 
+        where: {
           id: String(item.id),
-          userId: session.user.id 
+          userId: userId // 2. Pakai variabel murni yang sudah tervalidasi di atas
         },
         data: {
           positionX: item.x,
