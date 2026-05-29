@@ -10,8 +10,6 @@ import {
   MoreVertical,
   Trash2,
   Pencil,
-  ChevronDown,
-  ChevronRight,
   CalendarClock,
   Trophy,
   Pause,
@@ -131,7 +129,6 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
-  const [expandedGoal, setExpandedGoal] = useState<string | null>(null);
   const [newMilestoneText, setNewMilestoneText] = useState<
     Record<string, string>
   >({});
@@ -405,7 +402,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
             const daysLeft = goal.targetDate
               ? getDaysRemaining(goal.targetDate)
               : null;
-            const isExpanded = expandedGoal === goal.id;
+
             const completedMilestones = goal.milestones.filter(
               (m) => m.isCompleted,
             ).length;
