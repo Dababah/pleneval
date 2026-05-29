@@ -63,7 +63,9 @@ const ProgressRing = ({
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const hasMilestones = milestoneCount > 0;
-  const offset = circumference - (hasMilestones ? (progress / 100) * circumference : circumference);
+  const offset =
+    circumference -
+    (hasMilestones ? (progress / 100) * circumference : circumference);
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -89,15 +91,15 @@ const ProgressRing = ({
           strokeLinecap="round"
           className={cn(
             "transition-all duration-1000 ease-out",
-            !hasMilestones 
+            !hasMilestones
               ? "text-slate-200"
               : progress === 100
-              ? "text-emerald-500"
-              : progress >= 60
-              ? "text-zinc-900"
-              : progress >= 30
-              ? "text-amber-500"
-              : "text-slate-400"
+                ? "text-emerald-500"
+                : progress >= 60
+                  ? "text-zinc-900"
+                  : progress >= 30
+                    ? "text-amber-500"
+                    : "text-slate-400",
           )}
         />
       </svg>
@@ -106,9 +108,8 @@ const ProgressRing = ({
           className={cn(
             "font-bold leading-none",
             !hasMilestones ? "text-slate-300" : "text-zinc-900",
-            size >= 56 ? "text-xs" : "text-[9px]"
-          )}
-        >
+            size >= 56 ? "text-xs" : "text-[9px]",
+          )}>
           {hasMilestones ? `${progress}%` : "—"}
         </span>
       </div>
@@ -116,7 +117,13 @@ const ProgressRing = ({
   );
 };
 
-type StatusFilter = "all" | "in_progress" | "completed" | "paused" | "overdue" | "no_milestones";
+type StatusFilter =
+  | "all"
+  | "in_progress"
+  | "completed"
+  | "paused"
+  | "overdue"
+  | "no_milestones";
 
 const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
   const [goals, setGoals] = useState<Goal[]>(initialGoals);
@@ -130,7 +137,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
   >({});
   const [addingMilestone, setAddingMilestone] = useState<string | null>(null);
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
-    {}
+    {},
   );
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
@@ -174,7 +181,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
     const target = new Date(targetDate);
     const now = new Date();
     const diff = Math.ceil(
-      (target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      (target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
     );
     return diff;
   };
@@ -221,7 +228,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
   const handleToggleMilestone = async (
     goalId: string,
     milestoneId: string,
-    isCompleted: boolean
+    isCompleted: boolean,
   ) => {
     setLoadingStates((prev) => ({ ...prev, [milestoneId]: true }));
     try {
@@ -261,15 +268,12 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
     }
   };
 
-  const handleDeleteMilestone = async (
-    goalId: string,
-    milestoneId: string
-  ) => {
+  const handleDeleteMilestone = async (goalId: string, milestoneId: string) => {
     setLoadingStates((prev) => ({ ...prev, [milestoneId]: true }));
     try {
       const res = await fetch(
         `/api/goals/${goalId}/milestones?milestoneId=${milestoneId}`,
-        { method: "DELETE" }
+        { method: "DELETE" },
       );
       if (res.ok) {
         const updated = await res.json();
@@ -328,8 +332,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
               setEditingGoal(null);
               setModalOpen(true);
             }}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-zinc-900 text-white rounded-lg text-xs font-semibold shadow-md hover:bg-zinc-800 active:scale-95 transition-all"
-          >
+            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-zinc-900 text-white rounded-lg text-xs font-semibold shadow-md hover:bg-zinc-800 active:scale-95 transition-all">
             <Plus size={14} strokeWidth={2.5} />
             <span>{dict.goals?.newBtn || "New goal"}</span>
           </button>
@@ -378,18 +381,16 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
               "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all whitespace-nowrap",
               statusFilter === f.key
                 ? "bg-zinc-900 text-white shadow-md"
-                : "bg-white text-slate-500 border border-slate-100 hover:border-zinc-300"
-            )}
-          >
+                : "bg-white text-slate-500 border border-slate-100 hover:border-zinc-300",
+            )}>
             {f.label}
             <span
               className={cn(
                 "w-4 h-4 rounded-full text-[9px] flex items-center justify-center font-bold",
                 statusFilter === f.key
                   ? "bg-white/20 text-white"
-                  : "bg-slate-100 text-slate-400"
-              )}
-            >
+                  : "bg-slate-100 text-slate-400",
+              )}>
               {f.count}
             </span>
           </button>
@@ -406,7 +407,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
               : null;
             const isExpanded = expandedGoal === goal.id;
             const completedMilestones = goal.milestones.filter(
-              (m) => m.isCompleted
+              (m) => m.isCompleted,
             ).length;
 
             return (
@@ -422,22 +423,21 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                   status === "completed"
                     ? "border-emerald-200 bg-emerald-50/30"
                     : status === "overdue"
-                    ? "border-red-200 bg-red-50/20"
-                    : status === "no_milestones"
-                    ? "border-dashed border-slate-200 opacity-90"
-                    : "border-slate-100 hover:border-zinc-300"
-                )}
-              >
+                      ? "border-red-200 bg-red-50/20"
+                      : status === "no_milestones"
+                        ? "border-dashed border-slate-200 opacity-90"
+                        : "border-slate-100 hover:border-zinc-300",
+                )}>
                 {/* Card Header */}
                 <div className="p-4 md:p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
                       {/* Progress Ring */}
-                      <ProgressRing 
-                        progress={goal.progress} 
-                        milestoneCount={goal.milestones.length} 
-                        size={48} 
-                        strokeWidth={3.5} 
+                      <ProgressRing
+                        progress={goal.progress}
+                        milestoneCount={goal.milestones.length}
+                        size={48}
+                        strokeWidth={3.5}
                       />
 
                       <div className="flex-1 min-w-0 space-y-1">
@@ -449,17 +449,16 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                               status === "completed"
                                 ? "bg-emerald-100 text-emerald-700"
                                 : status === "overdue"
-                                ? "bg-red-100 text-red-600"
-                                : status === "no_milestones"
-                                ? "bg-slate-100 text-slate-400"
-                                : "bg-zinc-100 text-zinc-600"
-                            )}
-                          >
-                            {status === "no_milestones" 
-                              ? dict.goals?.noMilestones || "No Milestones" 
+                                  ? "bg-red-100 text-red-600"
+                                  : status === "no_milestones"
+                                    ? "bg-slate-100 text-slate-400"
+                                    : "bg-zinc-100 text-zinc-600",
+                            )}>
+                            {status === "no_milestones"
+                              ? dict.goals?.noMilestones || "No Milestones"
                               : status === "overdue"
-                              ? dict.goals?.status?.overdue || "Overdue"
-                              : dict.goals?.status?.[status] || status}
+                                ? dict.goals?.status?.overdue || "Overdue"
+                                : dict.goals?.status?.[status] || status}
                           </span>
 
                           {daysLeft !== null && status !== "completed" && (
@@ -469,16 +468,15 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                                 daysLeft < 0
                                   ? "text-red-500"
                                   : daysLeft <= 7
-                                  ? "text-amber-500"
-                                  : "text-slate-400"
-                              )}
-                            >
+                                    ? "text-amber-500"
+                                    : "text-slate-400",
+                              )}>
                               <CalendarClock size={10} />
                               {daysLeft < 0
                                 ? `${Math.abs(daysLeft)}d ${dict.goals?.overdue || "overdue"}`
                                 : daysLeft === 0
-                                ? dict.goals?.today || "Today"
-                                : `${daysLeft}d ${dict.goals?.left || "left"}`}
+                                  ? dict.goals?.today || "Today"
+                                  : `${daysLeft}d ${dict.goals?.left || "left"}`}
                             </span>
                           )}
                         </div>
@@ -496,14 +494,15 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                     </div>
 
                     {/* Menu */}
-                    <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <div
+                      className="relative shrink-0"
+                      onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setMenuOpen(menuOpen === goal.id ? null : goal.id);
                         }}
-                        className="p-1.5 text-slate-300 hover:text-zinc-900 transition-colors rounded-lg hover:bg-slate-50"
-                      >
+                        className="p-1.5 text-slate-300 hover:text-zinc-900 transition-colors rounded-lg hover:bg-slate-50">
                         <MoreVertical size={16} />
                       </button>
                       {menuOpen === goal.id && (
@@ -515,8 +514,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                               setModalOpen(true);
                               setMenuOpen(null);
                             }}
-                            className="w-full px-4 py-2 text-left text-xs font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-2 transition-colors"
-                          >
+                            className="w-full px-4 py-2 text-left text-xs font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-2 transition-colors">
                             <Pencil size={12} />
                             {dict.goals?.edit || "Edit"}
                           </button>
@@ -526,8 +524,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                               setDeleteConfirm(goal.id);
                               setMenuOpen(null);
                             }}
-                            className="w-full px-4 py-2 text-left text-xs font-semibold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-colors"
-                          >
+                            className="w-full px-4 py-2 text-left text-xs font-semibold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-colors">
                             <Trash2 size={12} />
                             {dict.goals?.delete || "Delete"}
                           </button>
@@ -538,11 +535,8 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
 
                   {/* Milestone Summary */}
                   <button
-                    onClick={() =>
-                      setExpandedGoal(isExpanded ? null : goal.id)
-                    }
-                    className="mt-3 w-full flex items-center justify-between py-2 px-3 bg-slate-50/80 hover:bg-slate-100/80 rounded-lg transition-all group/expand"
-                  >
+                    onClick={() => setExpandedGoal(isExpanded ? null : goal.id)}
+                    className="mt-3 w-full flex items-center justify-between py-2 px-3 bg-slate-50/80 hover:bg-slate-100/80 rounded-lg transition-all group/expand">
                     <div className="flex items-center gap-2">
                       <Flag size={11} className="text-slate-400" />
                       <span className="text-[10px] font-semibold text-slate-500">
@@ -556,7 +550,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                       size={12}
                       className={cn(
                         "text-slate-400 transition-transform duration-300",
-                        isExpanded && "rotate-180"
+                        isExpanded && "rotate-180",
                       )}
                     />
                   </button>
@@ -570,20 +564,18 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
+                      className="overflow-hidden">
                       <div className="px-4 md:px-5 pb-4 md:pb-5 space-y-1.5">
                         {goal.milestones.map((ms) => (
                           <div
                             key={ms.id}
-                            className="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-100/50 hover:bg-white hover:border-slate-200 transition-all group/ms"
-                          >
+                            className="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-100/50 hover:bg-white hover:border-slate-200 transition-all group/ms">
                             <button
                               onClick={() =>
                                 handleToggleMilestone(
                                   goal.id,
                                   ms.id,
-                                  !ms.isCompleted
+                                  !ms.isCompleted,
                                 )
                               }
                               disabled={loadingStates[ms.id]}
@@ -591,9 +583,8 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                                 "w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
                                 ms.isCompleted
                                   ? "bg-emerald-500 border-emerald-500 text-white"
-                                  : "border-slate-300 hover:border-zinc-700"
-                              )}
-                            >
+                                  : "border-slate-300 hover:border-zinc-700",
+                              )}>
                               {loadingStates[ms.id] ? (
                                 <Loader2
                                   size={8}
@@ -610,9 +601,8 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                                 "text-[11px] font-medium flex-1 truncate",
                                 ms.isCompleted
                                   ? "text-slate-400 line-through"
-                                  : "text-zinc-800"
-                              )}
-                            >
+                                  : "text-zinc-800",
+                              )}>
                               {ms.title}
                             </p>
                             <button
@@ -620,8 +610,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                                 handleDeleteMilestone(goal.id, ms.id)
                               }
                               disabled={loadingStates[ms.id]}
-                              className="opacity-0 group-hover/ms:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all"
-                            >
+                              className="opacity-0 group-hover/ms:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all">
                               <X size={10} />
                             </button>
                           </div>
@@ -640,8 +629,10 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                                 }))
                               }
                               onKeyDown={(e) => {
-                                if (e.key === "Enter") handleAddMilestone(goal.id);
-                                if (e.key === "Escape") setAddingMilestone(null);
+                                if (e.key === "Enter")
+                                  handleAddMilestone(goal.id);
+                                if (e.key === "Escape")
+                                  setAddingMilestone(null);
                               }}
                               placeholder={
                                 dict.goals?.milestonePlaceholder ||
@@ -655,8 +646,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                                 loadingStates[`add_${goal.id}`] ||
                                 !newMilestoneText[goal.id]?.trim()
                               }
-                              className="px-3 py-1 bg-zinc-900 text-white rounded-md text-[10px] font-semibold disabled:opacity-50 hover:bg-zinc-800 transition-all flex items-center gap-1"
-                            >
+                              className="px-3 py-1 bg-zinc-900 text-white rounded-md text-[10px] font-semibold disabled:opacity-50 hover:bg-zinc-800 transition-all flex items-center gap-1">
                               {loadingStates[`add_${goal.id}`] ? (
                                 <Loader2 size={10} className="animate-spin" />
                               ) : (
@@ -665,17 +655,15 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                             </button>
                             <button
                               onClick={() => setAddingMilestone(null)}
-                              className="p-1 text-slate-400 hover:text-zinc-900 transition-colors"
-                            >
+                              className="p-1 text-slate-400 hover:text-zinc-900 transition-colors">
                               <X size={12} />
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setAddingMilestone(goal.id)}
-                            className="w-full py-5 text-center text-[22px] font-medium text-slate-400 border border-dashed border-slate-200 rounded-lg hover:border-zinc-300 hover:text-zinc-900 transition-all flex items-center justify-center gap-1.5"
-                          >
-                            <Plus size={22} />
+                            className="w-full py-10 text-center text-[44px] font-medium text-slate-400 border border-dashed border-slate-200 rounded-lg hover:border-zinc-300 hover:text-zinc-900 transition-all flex items-center justify-center gap-1.5">
+                            <Plus size={44} />
                             {dict.goals?.addMilestone || "Add Milestone"}
                           </button>
                         )}
@@ -711,8 +699,7 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                   setEditingGoal(null);
                   setModalOpen(true);
                 }}
-                className="px-5 py-2.5 bg-zinc-900 text-white rounded-xl text-xs font-semibold shadow-md hover:bg-zinc-800 active:scale-95 transition-all flex items-center gap-2"
-              >
+                className="px-5 py-2.5 bg-zinc-900 text-white rounded-xl text-xs font-semibold shadow-md hover:bg-zinc-800 active:scale-95 transition-all flex items-center gap-2">
                 <Sparkles size={12} />
                 {dict.goals?.createFirst || "Create Goal"}
               </button>
