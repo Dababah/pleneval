@@ -191,6 +191,24 @@ const KanbanBoard = ({ dict, lang }: KanbanBoardProps) => {
     }
   };
 
+  const handleToggleComplete = async (task: Task) => {
+    const newStatus = task.status === 'done' ? 'todo' : 'done';
+    
+    // Update locally / optimistically
+    setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t));
+    
+    try {
+      await fetch(`/api/tasks/${task.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+    } catch (error) {
+      console.error(error);
+      fetchTasks(); // Rollback on error
+    }
+  };
+
   const filteredTasks = tasks.filter(t => {
     const matchesSearch = t.title.toLowerCase().includes(search.toLowerCase()) || 
                          t.description?.toLowerCase().includes(search.toLowerCase());
@@ -243,6 +261,7 @@ const KanbanBoard = ({ dict, lang }: KanbanBoardProps) => {
                   dict={dict}
                   onAddTask={(status) => { setTargetStatus(status); setEditingTask(null); setIsModalOpen(true); }}
                   onTaskClick={(task) => { setEditingTask(task); setIsModalOpen(true); }}
+                  onToggleComplete={handleToggleComplete}
                 />
               ))}
             </div>

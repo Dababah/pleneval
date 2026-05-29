@@ -19,9 +19,10 @@ interface TaskCardProps {
   index: number;
   dict: any;
   onClick: (task: Task) => void;
+  onToggleComplete?: (task: Task) => void;
 }
 
-const TaskCard = ({ task, index, dict, onClick }: TaskCardProps) => {
+const TaskCard = ({ task, index, dict, onClick, onToggleComplete }: TaskCardProps) => {
   const getDeadlineInfo = () => {
     if (!task.dueDate) return null;
     const date = new Date(task.dueDate);
@@ -102,6 +103,18 @@ const TaskCard = ({ task, index, dict, onClick }: TaskCardProps) => {
               <p className="text-[10px] text-slate-400 font-medium line-clamp-1 leading-relaxed">
                 {task.description}
               </p>
+            )}
+            {task.status !== 'done' && onToggleComplete && (
+              <button
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleComplete(task);
+                }}
+                className="w-full mt-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-[10px] font-black tracking-widest uppercase transition-all shadow-sm active:scale-[0.97] text-center cursor-pointer"
+              >
+                Tandai Selesai
+              </button>
             )}
           </div>
 

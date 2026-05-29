@@ -16,6 +16,7 @@ interface KanbanColumnProps {
   onAddTask: (status: string) => void;
   onTaskClick: (task: Task) => void;
   colorClass: string;
+  onToggleComplete?: (task: Task) => void;
 }
 
 const KanbanColumn = ({ 
@@ -25,7 +26,8 @@ const KanbanColumn = ({
   dict, 
   onAddTask, 
   onTaskClick,
-  colorClass 
+  colorClass,
+  onToggleComplete
 }: KanbanColumnProps) => {
   return (
     <div className="flex flex-col flex-1 min-w-0 bg-slate-50/40 rounded-2xl border border-slate-100 p-3 min-h-[500px]">
@@ -69,6 +71,7 @@ const KanbanColumn = ({
                     index={index} 
                     dict={dict} 
                     onClick={onTaskClick}
+                    onToggleComplete={onToggleComplete}
                   />
                 ))
               )}

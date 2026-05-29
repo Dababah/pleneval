@@ -106,9 +106,9 @@ export default function TransactionModal({ onClose, onSave, initialData, budgets
            {/* Amount & Type */}
            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest pl-1">{dict.finance.transactions.table.amount} ({lang === 'id' ? 'Rp' : 'USD'})</label>
+                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest pl-1">{dict.finance.transactions.table.amount} (Rp)</label>
                 <div className="relative group">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 pointer-events-none group-focus-within:text-zinc-900 transition-colors uppercase">{lang === 'id' ? 'Rp' : '$'}</div>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 pointer-events-none group-focus-within:text-zinc-900 transition-colors uppercase">Rp</div>
                     <input 
                         value={amountStr}
                         onChange={(e) => setAmountStr(formatCurrencyInput(e.target.value))}

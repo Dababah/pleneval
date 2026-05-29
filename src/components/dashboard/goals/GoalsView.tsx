@@ -673,9 +673,9 @@ const GoalsView = ({ initialGoals, lang, dict }: GoalsViewProps) => {
                         ) : (
                           <button
                             onClick={() => setAddingMilestone(goal.id)}
-                            className="w-full py-2.5 text-center text-[11px] font-medium text-slate-400 border border-dashed border-slate-200 rounded-lg hover:border-zinc-300 hover:text-zinc-900 transition-all flex items-center justify-center gap-1.5"
+                            className="w-full py-5 text-center text-[22px] font-medium text-slate-400 border border-dashed border-slate-200 rounded-lg hover:border-zinc-300 hover:text-zinc-900 transition-all flex items-center justify-center gap-1.5"
                           >
-                            <Plus size={11} />
+                            <Plus size={22} />
                             {dict.goals?.addMilestone || "Add Milestone"}
                           </button>
                         )}

@@ -43,6 +43,7 @@ interface Habit {
   items: HabitItem[];
   logs: HabitLog[];
   createdAt: string | Date;
+  currentStreak?: number;
 }
 
 interface HabitsViewProps {

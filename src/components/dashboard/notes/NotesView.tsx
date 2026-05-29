@@ -408,7 +408,7 @@ const NotesView = ({ initialNotes, lang, dict }: NotesViewProps) => {
                 preventCollision={false}
                 useCSSTransforms={true} // Bikin drag/drop lebih smooth pake GPU
                 onBreakpointChange={setCurrentBreakpoint}
-                onLayoutChange={(layout) => onLayoutChange(layout)}
+                onLayoutChange={(layout) => onLayoutChange([...layout])}
               >
                 {displayedNotes.map((note) => (
                   <div key={note.id} className="cursor-pointer group">
