@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Tambahkan baris ini jika belum ada
 }
 
 model User {
@@ -43,43 +44,41 @@ model User {
 }
 
 model Task {
-  id          String    @id @default(cuid())
-  title       String    @db.VarChar(500)
-  description String?   @db.Text
-  priority    String    @default("medium") // low, medium, high
-  status      String    @default("todo")   // todo, in_progress, done, cancelled
-  category    String?   @default("Lainnya")
-  dueDate     DateTime? @map("due_date")
-  userId      String    @map("user_id")
-  position    Int       @default(0)
+  id             String          @id @default(cuid())
+  title          String
+  description    String?
+  priority       String          @default("medium") // low, medium, high
+  status         String          @default("todo")   // todo, in_progress, done, cancelled
+  category       String?         @default("Lainnya")
+  dueDate        DateTime?       @map("due_date")
+  userId         String          @map("user_id")
+  position       Int             @default(0)
   
-  completedAt DateTime? @map("completed_at")
-  cancelledAt DateTime? @map("cancelled_at")
+  completedAt    DateTime?       @map("completed_at")
+  cancelledAt    DateTime?       @map("cancelled_at")
   
   isArchived     Boolean         @default(false) @map("is_archived")
   archivedAt     DateTime?       @map("archived_at")
   archivedReason ArchivedReason? @map("archived_reason")
   
-  subtasks    Subtask[]
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  subtasks       Subtask[]
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
 
-  @@index([userId], map: "tasks_user_id_fkey")
   @@map("tasks")
 }
 
 model Subtask {
-  id          String   @id @default(cuid())
-  taskId      String   @map("task_id")
-  title       String   @db.VarChar(500)
-  isDone      Boolean  @default(false) @map("is_done")
-  position    Int      @default(0)
-  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(cuid())
+  taskId    String   @map("task_id")
+  title     String
+  isDone    Boolean  @default(false) @map("is_done")
+  position  Int      @default(0)
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@index([taskId], map: "subtasks_task_id_fkey")
   @@map("subtasks")
 }
 
@@ -103,7 +102,7 @@ model TaskCategory {
 model Event {
   id          String   @id @default(cuid())
   title       String
-  description String?  @db.Text
+  description String?
   start       DateTime
   end         DateTime
   category    String?  @default("general")
@@ -113,14 +112,13 @@ model Event {
   updatedAt   DateTime @updatedAt @map("updated_at")
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "events_user_id_fkey")
   @@map("events")
 }
 
 model Goal {
   id          String      @id @default(cuid())
   title       String
-  description String?     @db.Text
+  description String?
   targetDate  DateTime?   @map("target_date")
   progress    Int         @default(0)
   userId      String      @map("user_id")
@@ -129,7 +127,6 @@ model Goal {
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   milestones  Milestone[]
 
-  @@index([userId], map: "goals_user_id_fkey")
   @@map("goals")
 }
 
@@ -142,26 +139,24 @@ model Milestone {
   updatedAt   DateTime @updatedAt @map("updated_at")
   goal        Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
 
-  @@index([goalId], map: "milestones_goal_id_fkey")
   @@map("milestones")
 }
 
 model Habit {
-  id           String     @id @default(cuid())
-  title        String
-  description  String?    @db.Text
-  frequency    String     @default("daily")
-  scheduleDays String?    @map("schedule_days") @db.Text
-  icon         String?    @default("⚡")
-  currentStreak Int       @default(0) @map("current_streak")
-  userId       String     @map("user_id")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
-  items        HabitItem[]
-  logs         HabitLog[]
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  title         String
+  description   String?
+  frequency     String      @default("daily")
+  scheduleDays  String?     @map("schedule_days")
+  icon          String?     @default("⚡")
+  currentStreak Int         @default(0) @map("current_streak")
+  userId        String      @map("user_id")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  items         HabitItem[]
+  logs          HabitLog[]
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "habits_user_id_fkey")
   @@map("habits")
 }
 
@@ -173,7 +168,6 @@ model HabitItem {
   createdAt DateTime @default(now()) @map("created_at")
   habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
-  @@index([habitId], map: "habit_items_habit_id_fkey")
   @@map("habit_items")
 }
 
@@ -185,7 +179,6 @@ model HabitLog {
   isCompleted Boolean  @default(true) @map("is_completed")
   habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
-  @@index([habitId], map: "habit_logs_habit_id_fkey")
   @@unique([habitId, habitItemId, date])
   @@map("habit_logs")
 }
@@ -193,26 +186,25 @@ model HabitLog {
 model Note {
   id        String   @id @default(cuid())
   title     String
-  content   String?  @db.Text
+  content   String?
   category  String?
-  color       String?
-  colSpan     Int      @default(1) @map("col_span")
-  rowSpan     Int      @default(1) @map("row_span")
-  positionX   Int      @default(0) @map("pos_x")
-  positionY   Int      @default(0) @map("pos_y")
+  color     String?
+  colSpan   Int      @default(1) @map("col_span")
+  rowSpan   Int      @default(1) @map("row_span")
+  positionX Int      @default(0) @map("pos_x")
+  positionY Int      @default(0) @map("pos_y")
   isPinned  Boolean  @default(false) @map("is_pinned")
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "notes_user_id_fkey")
   @@map("notes")
 }
 
 model JournalEntry {
   id        String   @id @default(cuid())
-  content   String   @db.Text
+  content   String
   mood      String?
   date      DateTime @default(now())
   userId    String   @map("user_id")
@@ -230,17 +222,16 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-  @@index([userId], map: "accounts_user_id_fkey")
   @@map("accounts")
 }
 
@@ -251,7 +242,6 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "sessions_user_id_fkey")
   @@map("sessions")
 }
 
@@ -287,7 +277,6 @@ model FinanceTransaction {
   updatedAt DateTime @updatedAt @map("updated_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "finance_transactions_user_id_fkey")
   @@map("finance_transactions")
 }
 
@@ -302,7 +291,6 @@ model FinanceBudget {
   updatedAt DateTime @updatedAt @map("updated_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "finance_budgets_user_id_fkey")
   @@map("finance_budgets")
 }
 
@@ -319,7 +307,6 @@ model FinanceSavingGoal {
   deposits      FinanceSavingDeposit[]
   user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "finance_saving_goals_user_id_fkey")
   @@map("finance_saving_goals")
 }
 
@@ -332,7 +319,6 @@ model FinanceSavingDeposit {
   updatedAt    DateTime          @updatedAt @map("updated_at")
   savingGoal   FinanceSavingGoal @relation(fields: [savingGoalId], references: [id], onDelete: Cascade)
 
-  @@index([savingGoalId], map: "finance_saving_deposits_saving_goal_id_fkey")
   @@map("finance_saving_deposits")
 }
 
@@ -351,7 +337,6 @@ model FinanceDebt {
   payments       FinanceDebtPayment[]
   user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "finance_debts_user_id_fkey")
   @@map("finance_debts")
 }
 
@@ -364,7 +349,6 @@ model FinanceDebtPayment {
   updatedAt DateTime    @updatedAt @map("updated_at")
   debt      FinanceDebt @relation(fields: [debtId], references: [id], onDelete: Cascade)
 
-  @@index([debtId], map: "finance_debt_payments_debt_id_fkey")
   @@map("finance_debt_payments")
 }
 
@@ -382,7 +366,6 @@ model FinanceInvestment {
   updatedAt     DateTime @updatedAt @map("updated_at")
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "finance_investments_user_id_fkey")
   @@map("finance_investments")
 }
 
@@ -391,8 +374,8 @@ model UserSettings {
   userId                    String   @unique @map("user_id")
   aiProvider                String?  @map("ai_provider")
   aiModel                   String?  @map("ai_model")
-  aiApiKeyEncrypted         String?  @map("ai_api_key_encrypted") @db.Text
-  telegramBotTokenEncrypted String?  @map("telegram_bot_token_encrypted") @db.Text
+  aiApiKeyEncrypted         String?  @map("ai_api_key_encrypted")
+  telegramBotTokenEncrypted String?  @map("telegram_bot_token_encrypted")
   telegramChatId            String?  @map("telegram_chat_id")
   notifMorningSummary       Boolean  @default(false) @map("notif_morning_summary")
   notifStockDropPct         Float    @default(5) @map("notif_stock_drop_pct")
@@ -401,10 +384,10 @@ model UserSettings {
   notifBudgetThresholdPct   Int      @default(80) @map("notif_budget_threshold_pct")
   notifSavingReminder       Boolean  @default(false) @map("notif_saving_reminder")
   notifTelegramAiChat       Boolean  @default(false) @map("notif_telegram_ai_chat")
-  customAiEndpoint          String?  @map("custom_ai_endpoint") @db.Text
+  customAiEndpoint          String?  @map("custom_ai_endpoint")
   customAiHeaderName        String?  @map("custom_ai_header_name")
   customAiHeaderPrefix      String?  @map("custom_ai_header_prefix")
-  customAiBodyTemplate      String?  @map("custom_ai_body_template") @db.Text
+  customAiBodyTemplate      String?  @map("custom_ai_body_template")
   createdAt                 DateTime @default(now()) @map("created_at")
   updatedAt                 DateTime @updatedAt @map("updated_at")
   user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -415,22 +398,21 @@ model UserSettings {
 model Course {
   id         String   @id @default(cuid())
   userId     String   @map("user_id")
-  day        String   // "Senin", "Selasa", etc.
-  startTime  String   @map("start_time") // "HH:mm"
-  endTime    String   @map("end_time")   // "HH:mm"
+  day        String   
+  startTime  String   @map("start_time") 
+  endTime    String   @map("end_time")   
   courseCode String   @map("course_code")
   courseName String   @map("course_name")
   className  String?  @map("class_name")
   lecturer   String?
   room       String?
-  priority   String    @default("medium") // low, medium, high
+  priority   String   @default("medium") 
   color      String?
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "courses_user_id_fkey")
   @@map("courses")
 }
 
@@ -443,20 +425,18 @@ model Follows {
   following   User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@id([followerId, followingId])
-  @@index([followingId], map: "follows_following_id_fkey")
   @@map("follows")
 }
 
 model Activity {
   id          String   @id @default(cuid())
   userId      String   @map("user_id")
-  type        String   // e.g. "MILESTONE_REACHED"
-  referenceId String?  @map("reference_id") // ID to habit/goal
-  metadata    String?  @db.Text // JSON data e.g. {"milestone": 30}
+  type        String   
+  referenceId String?  @map("reference_id") 
+  metadata    String?  
   createdAt   DateTime @default(now()) @map("created_at")
 
   user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "activities_user_id_fkey")
   @@map("activities")
 }
